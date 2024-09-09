@@ -1,0 +1,151 @@
+//To checvkout code 
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'branch name')
+    }
+    stages {
+        stage('Code Checkout') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'GIT_TOKEN', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')])  {
+                        def gitUrl = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Vikasvk17/javaprivate.git"
+                        git(
+                            url: gitUrl,
+                            branch: BRANCH_NAME
+                        )
+                    }
+                }                
+            }
+        }      
+    }  
+}
+//For Build 
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'branch name')
+    }
+    stages {
+        stage('Code Checkout') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'GIT_TOKEN', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')])  {
+                        def gitUrl = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/akshay8181/example-tomcat-war.git"
+                        git(
+                            url: gitUrl,
+                            branch: BRANCH_NAME
+                        )
+                    }
+                }                
+            }
+        } 
+        stage('JAR Build') {
+            steps {
+                script {
+                        sh "mvn install"
+                }
+            }
+        }        
+    }  
+}
+//connection
+passwordVariable: 'GIT_PASSWORD')])  {
+                        def gitUrl = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/akshay8181/example-tomcat-war.git"
+                        git(
+                            url: gitUrl,
+                            branch: BRANCH_NAME
+                        )
+                    }
+                }                
+            }
+        } 
+        stage('JAR Build') {
+            steps {
+                script {
+                        sh "mvn install"
+                }
+            }
+        } 
+        stage('Deploy Jar') {
+            steps {
+                sshPublisher(publishers: [sshPublisherDesc(
+                    configName: 'tomcat', 
+                    transfers: [sshTransfer(
+                        cleanRemote: false, 
+                        excludes: '', 
+                        execCommand: '', 
+                        execTimeout: 120000, 
+                        flatten: false, 
+                        noDefaultExcludes: false, 
+                        patternSeparator: '[, ]+', 
+                        remoteDirectorySDF: false, 
+                        removePrefix: '', 
+                        sourceFiles: 'target/*.war'  // Adjust this pattern to match the files you want to transfer
+                    )], 
+                    usePromotionTimestamp: false, 
+                    useWorkspaceInPromotion: false, 
+                    verbose: false
+                )])                 
+            }
+        }        
+    }  
+}
+//code till connection and need to save in docs
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'branch name')
+    }
+    stages {
+        stage('Code Checkout') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'GIT_TOKEN', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')])  {
+                        def gitUrl = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Vikasvk17/javaprivate.git"
+                        git(
+                            url: gitUrl,
+                            branch: BRANCH_NAME
+                        )
+                    }
+                }                
+            }
+        } 
+        stage('JAR Build') {
+            steps {
+                script {
+                        sh "mvn install"
+                }
+            }
+        }
+        stage('Deploy Jar') {
+            steps {
+                sshPublisher(publishers: [sshPublisherDesc(
+                    configName: 'project_java_war', 
+                    transfers: [sshTransfer(
+                        cleanRemote: false, 
+                        excludes: '', 
+                        execCommand: '', 
+                        execTimeout: 120000, 
+                        flatten: false, 
+                        noDefaultExcludes: false, 
+                        patternSeparator: '[, ]+', 
+                        remoteDirectorySDF: false, 
+                        removePrefix: '', 
+                        sourceFiles: 'target/*.jar'  // Adjust this pattern to match the files you want to transfer
+                    )], 
+                    usePromotionTimestamp: false, 
+                    useWorkspaceInPromotion: false, 
+                    verbose: false
+                )])                 
+            
+                
+            }
+        }
+        
+       
+    }  
+}
